@@ -1,0 +1,16 @@
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  example_matrix:
+    strategy:
+      matrix:
+        version: [1,2,3]
+    steps:
+      - run: |
+          echo Matrix value: "${{ matrix.value }}"
+      - if: ${{fromJson(matrix.version[-1])}} == ${{ matrix.value }}
+        run: |
+          echo Matrix value (latest): "${{ matrix.value }}"

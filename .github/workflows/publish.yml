@@ -1,13 +1,14 @@
-on:
-  # Triggers the workflow nightly (at midnight)
-  schedule:
-    - cron: "0 0 * * *"
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
+# temporary disabling workflow
+#on:
+#  # Triggers the workflow nightly (at midnight)
+#  schedule:
+#    - cron: "0 0 * * *"
+#  push:
+#    branches:
+#      - main
+#  pull_request:
+#    branches:
+#      - main
 
 env:
   URL_RELEASES: https://archive.apache.org/dist/activemq
@@ -44,7 +45,7 @@ jobs:
     steps:
       - run: |
           echo Publishing tag: "${{ matrix.value }}"
-      - if: ${{fromJson(needs.identify.outputs.latest[-1])}} == ${{ matrix.value }}
+      - if: ${{fromJson(needs.identify.outputs.matrix[-1])}} == ${{ matrix.value }}
         run: |
           echo Publishing as latest: "${{ matrix.value }}"
 
