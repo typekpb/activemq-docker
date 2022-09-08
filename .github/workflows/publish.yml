@@ -32,8 +32,10 @@ jobs:
           pip install -r requirements.txt
       - id: matrix
         run: |
+          echo dry run
           python print_versions.py -r $URL_RELEASES -t $URL_TAGS
           python print_versions.py -r $URL_RELEASES -t $URL_TAGS --latest-only
+          echo assigning job outputs
           echo "::set-output name=matrix::$(python print_versions.py -r $URL_RELEASES -t $URL_TAGS)"
           echo "::set-output name=latest::$(python print_versions.py -r $URL_RELEASES -t $URL_TAGS --latest-only)"
 
@@ -42,7 +44,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        value: ${{fromJson(needs.setup.outputs.matrix)}}
+        value: ${{fromJson(needs.identify.outputs.matrix)}}
     steps:
       - run: |
           echo "${{ matrix.value }}"
@@ -52,7 +54,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        value: ${{fromJson(needs.setup.outputs.latest)}}
+        value: ${{fromJson(needs.identify.outputs.latest)}}
     steps:
       - run: |
           echo "${{ matrix.value }}"
@@ -62,7 +64,7 @@ jobs:
   #   runs-on: ubuntu-latest
   #   strategy:
   #     matrix:
-  #       value: ${{fromJson(needs.setup.outputs.matrix)}}
+  #       value: ${{fromJson(needs.identify.outputs.matrix)}}
   #   if: github.ref == 'refs/heads/master'
   #   steps:
   #     - name: Checkout
@@ -88,7 +90,7 @@ jobs:
   #   runs-on: ubuntu-latest
   #   strategy:
   #     matrix:
-  #       value: ${{fromJson(needs.setup.outputs.latest)}}
+  #       value: ${{fromJson(needs.identify.outputs.latest)}}
   #   if: github.ref == 'refs/heads/master'
   #   steps:
   #     - name: Checkout

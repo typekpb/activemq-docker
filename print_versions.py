@@ -32,7 +32,7 @@ def main(argv):
     latestOnly = False
 
     try:
-        opts, args = getopt.getopt(argv, "hlt:r:", ["tags-url=", "releases-url="])
+        opts, args = getopt.getopt(argv, "hlt:r:", ["tags-url=", "releases-url=", "latest-only"])
     except getopt.GetoptError:
         print
         'print_versions.py -t <dockerhub tags url> -r <releases url> [--latest-only]'
