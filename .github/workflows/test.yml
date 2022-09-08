@@ -5,6 +5,7 @@ on:
 
 jobs:
   example_matrix:
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         version: [1,2,3]
