@@ -40,56 +40,84 @@ jobs:
           echo "::set-output name=matrix::$(python print_versions.py -r $URL_RELEASES -t $URL_TAGS)"
           echo "::set-output name=latest::$(python print_versions.py -r $URL_RELEASES -t $URL_TAGS --latest-only)"
 
-  debug:
-    needs: [ identify ]
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        value: ${{fromJson(needs.identify.outputs.matrix)}}
-    steps:
-      - run: |
-          echo Publishing tag: "${{ matrix.value }}"
+   publish:
+     needs: [ identify ]
+     runs-on: ubuntu-latest
+     strategy:
+       matrix:
+         value: ${{fromJson(needs.identify.outputs.matrix)}}
+     if: github.ref == 'refs/heads/master'
+     steps:
+       - name: Checkout
+         uses: actions/checkout@v2.3.5
+       - name: Set up QEMU
+         uses: docker/setup-qemu-action@v1.2.0
+       - name: Set up Docker Buildx
+         uses: docker/setup-buildx-action@v1.6.0
+       - name: Login to DockerHub
+         uses: docker/login-action@v1.10.0
+         with:
+           username: ${{ secrets.DOCKERHUB_USERNAME }}
+           password: ${{ secrets.DOCKERHUB_TOKEN }}
+       - name: Base image identification
+         id: base-image
+         run: |
+           # AMQ versions >=5.9.x && <= 5.13.x => JDK 7
+           if [[ ${{ matrix.value }} =~ ^5\.(9|10|11|12|13)\.[0-9]+$ ]]; then
+               echo ::set-output name=build_openjdk::true
+               echo ::set-output name=from_openjdk::openjdk:7
+               echo ::set-output name=build_alpine::false
+           else
+              # JDK 8 + alpine
+               echo ::set-output name=build_openjdk::true
+               echo ::set-output name=from_openjdk::openjdk:8-jre
+               echo ::set-output name=build_alpine::true
+               echo ::set-output name=from_alpine::openjdk:8-jre-alpine
+           fi
+       - name: Build and push from openjdk
+         uses: docker/build-push-action@v2.7.0
+         if: ${{ steps.base-image.outputs.build_openjdk }}
+         with:
+           push: true
+           build-args: |
+              ACTIVEMQ_VERSION=${{ matrix.value }}
+              BASE_IMG=${{ steps.base-image.outputs.from_openjdk }}
+           tags: butkovic/activemq:${{ matrix.value }}
+       - name: Build and push from openjdk alpine
+         uses: docker/build-push-action@v2.7.0
+         if: ${{ steps.base-image.outputs.build_alpine }}
+         with:
+           push: true
+           build-args: |
+              ACTIVEMQ_VERSION=${{ matrix.value }}
+              BASE_IMG=${{ steps.base-image.outputs.from_alpine }}
+           file: Dockerfile.alpine
+           tags: butkovic/activemq:${{ matrix.value }}-alpine
 
-  debug-latest:
-    needs: [ identify ]
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        value: ${{fromJson(needs.identify.outputs.latest)}}
-    steps:
-      - run: |
-          echo Publishing tag: "${{ matrix.value }}"
-
-  # pubhish:
-  #   needs: [ identify ]
-  #   runs-on: ubuntu-latest
-  #   strategy:
-  #     matrix:
-  #       value: ${{fromJson(needs.identify.outputs.matrix)}}
-  #   if: github.ref == 'refs/heads/master'
-  #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@v2.3.5
-  #     - name: Set up QEMU
-  #       uses: docker/setup-qemu-action@v1.2.0
-  #     - name: Set up Docker Buildx
-  #       uses: docker/setup-buildx-action@v1.6.0
-  #     - name: Login to DockerHub
-  #       uses: docker/login-action@v1.10.0
-  #       with:
-  #         username: ${{ secrets.DOCKERHUB_USERNAME }}
-  #         password: ${{ secrets.DOCKERHUB_TOKEN }}
-#       - name: Build and push
-#         uses: docker/build-push-action@v2.7.0
-#         with:
-#           push: true
-#           build-args: ${{ matrix.value }}
-#           tags: butkovic/activemq:${{ matrix.value }}
-#       - name: Build and push latest
-#         if: ${{fromJson(needs.identify.outputs.matrix[-1])}} == ${{ matrix.value }}
-#         uses: docker/build-push-action@v2.7.0
-#         with:
-#           push: true
-#           build-args: ${{ matrix.value }}
-#           tags: butkovic/activemq:latest
-
+   pubish-latest:
+     needs: [ identify ]
+     runs-on: ubuntu-latest
+     strategy:
+       matrix:
+         value: ${{fromJson(needs.identify.outputs.latest)}}
+     if: github.ref == 'refs/heads/master'
+     steps:
+       - name: Checkout
+         uses: actions/checkout@v2.3.5
+       - name: Set up QEMU
+         uses: docker/setup-qemu-action@v1.2.0
+       - name: Set up Docker Buildx
+         uses: docker/setup-buildx-action@v1.6.0
+       - name: Login to DockerHub
+         uses: docker/login-action@v1.10.0
+         with:
+           username: ${{ secrets.DOCKERHUB_USERNAME }}
+           password: ${{ secrets.DOCKERHUB_TOKEN }}
+       - name: Build and push latest
+         uses: docker/build-push-action@v2.7.0
+         with:
+           push: true
+           build-args: |
+             ACTIVEMQ_VERSION=${{ matrix.value }}
+             BASE_IMG=openjdk:8-jre
+           tags: butkovic/activemq:latest
