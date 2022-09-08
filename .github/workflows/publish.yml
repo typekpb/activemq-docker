@@ -16,6 +16,8 @@ jobs:
     outputs:
       matrix: ${{ steps.matrix.outputs.value }}
     steps:
+      - name: Checkout
+        uses: actions/checkout@v2.3.5
       # inspiration: https://brunoscheufler.com/blog/2021-10-09-generating-dynamic-github-actions-workflows-with-the-job-matrix-strategy
       - id: matrix
         run: |
