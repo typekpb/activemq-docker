@@ -10,8 +10,8 @@ on:
       - main
 
 env:
-  URL_RELEASES: https://archive.apache.org/dist/activemq
-  URL_TAGS: https://registry.hub.docker.com/v2/repositories/butkovic/activemq/tags?page_size=1024
+  URL_RELEASES: "https://archive.apache.org/dist/activemq"
+  URL_TAGS: "https://registry.hub.docker.com/v2/repositories/butkovic/activemq/tags?page_size=1024"
 
 jobs:
 
