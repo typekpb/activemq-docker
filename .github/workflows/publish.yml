@@ -32,8 +32,8 @@ jobs:
 #          pip install setuptools wheel twine
       - id: matrix
         run: |
-          echo "::set-output name=matrix::$(./print_versions.sh -r $URL_RELEASES -t $URL_TAGS)"
-          echo "::set-output name=latest::$(./print_versions.sh -r $URL_RELEASES -t $URL_TAGS --latest-only)"
+          echo "::set-output name=matrix::$(python print_versions.py -r $URL_RELEASES -t $URL_TAGS)"
+          echo "::set-output name=latest::$(python print_versions.py -r $URL_RELEASES -t $URL_TAGS --latest-only)"
 
   debug:
     needs: [ identify ]
