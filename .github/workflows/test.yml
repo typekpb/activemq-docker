@@ -12,6 +12,7 @@ jobs:
     steps:
       - run: |
           echo Matrix value: "${{ matrix.value }}"
-      - if: ${{ matrix.version[-1] }} == ${{ matrix.value }}
-        run: |
-          echo Matrix value (latest): "${{ matrix.value }}"
+          echo Matrix one but last value: "${{ matrix.version[-1] }}"
+#      - if: ${{ matrix.version[-1] }} == ${{ matrix.value }}
+#        run: |
+#          echo Matrix value (latest): "${{ matrix.value }}"
