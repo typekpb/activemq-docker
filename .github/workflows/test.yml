@@ -12,6 +12,6 @@ jobs:
     steps:
       - run: |
           echo Matrix value: "${{ matrix.value }}"
-      - if: ${{fromJson(matrix.version[-1])}} == ${{ matrix.value }}
+      - if: ${{ matrix.version[-1] }} == ${{ matrix.value }}
         run: |
           echo Matrix value (latest): "${{ matrix.value }}"
