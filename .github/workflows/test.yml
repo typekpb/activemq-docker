@@ -8,10 +8,12 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.matrix.outputs.matrix }}
+      last: ${{ steps.matrix.outputs.last }}
     steps:
       - id: matrix
         run: |
           echo "::set-output name=matrix::[\"1\",\"2\"]"
+          echo "::set-output name=last::[\"2\"]"
 
   job2:
     needs: [ job1 ]
@@ -24,3 +26,13 @@ jobs:
           echo Current: "${{ matrix.value }}"
           echo All "${{fromJson(needs.job1.outputs.matrix)}}"
           echo Last: "${{fromJson(needs.job1.outputs.matrix)[-1]}}"
+
+  job3:
+    needs: [ job1 ]
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        value: ${{fromJson(needs.job1.outputs.last)}}
+    steps:
+      - run: |
+          echo Current: "${{ matrix.value }}"
