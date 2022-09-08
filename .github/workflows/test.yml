@@ -4,15 +4,23 @@ on:
       - main
 
 jobs:
-  example_matrix:
+  job1:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.matrix.outputs.matrix }}
+    steps:
+      - id: matrix
+        run: |
+          echo "::set-output name=matrix::[\"1\",\"2\"]"
+
+  job2:
+    needs: [ job1 ]
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        version: [1,2,3]
+        value: ${{fromJson(needs.job1.outputs.matrix)}}
     steps:
       - run: |
-          echo Matrix value: "${{ matrix.version }}"
-          echo Matrix one but last value: "${{ matrix.version[-1] }}"
-#      - if: ${{ matrix.version[-1] }} == ${{ matrix.value }}
-#        run: |
-#          echo Matrix value (latest): "${{ matrix.value }}"
+          echo Current: "${{ matrix.value }}"
+          echo All "${{fromJson(needs.job1.outputs.matrix)}}"
+          echo Last: "${{fromJson(needs.job1.outputs.matrix)[-1]}}"
