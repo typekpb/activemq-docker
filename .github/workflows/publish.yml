@@ -32,8 +32,8 @@ jobs:
           pip install -r requirements.txt
       - id: matrix
         run: |
-          echo "python print_versions.py -r $URL_RELEASES -t $URL_TAGS"
-          echo "python print_versions.py -r $URL_RELEASES -t $URL_TAGS --latest-only"
+          python print_versions.py -r $URL_RELEASES -t $URL_TAGS
+          python print_versions.py -r $URL_RELEASES -t $URL_TAGS --latest-only
           echo "::set-output name=matrix::$(python print_versions.py -r $URL_RELEASES -t $URL_TAGS)"
           echo "::set-output name=latest::$(python print_versions.py -r $URL_RELEASES -t $URL_TAGS --latest-only)"
 
