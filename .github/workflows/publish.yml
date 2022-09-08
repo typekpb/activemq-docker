@@ -14,6 +14,7 @@ env:
   URL_TAGS: "https://registry.hub.docker.com/v2/repositories/butkovic/activemq/tags?page_size=1024"
 
 jobs:
+
   identify:
     runs-on: ubuntu-latest
     outputs:
@@ -39,7 +40,7 @@ jobs:
           echo "::set-output name=matrix::$(python print_versions.py -r $URL_RELEASES -t $URL_TAGS)"
           echo "::set-output name=latest::$(python print_versions.py -r $URL_RELEASES -t $URL_TAGS --latest-only)"
 
-   publish:
+  publish:
      needs: [ identify ]
      runs-on: ubuntu-latest
      strategy:
@@ -93,7 +94,7 @@ jobs:
            file: Dockerfile.alpine
            tags: butkovic/activemq:${{ matrix.value }}-alpine
 
-   pubish-latest:
+  publish-latest:
      needs: [ identify ]
      runs-on: ubuntu-latest
      strategy:
