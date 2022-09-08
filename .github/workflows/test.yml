@@ -1,7 +1,7 @@
-on:
-  push:
-    branches:
-      - main
+#on:
+#  push:
+#    branches:
+#      - main
 
 jobs:
   job1:
@@ -24,8 +24,6 @@ jobs:
     steps:
       - run: |
           echo Current: "${{ matrix.value }}"
-          echo All "${{fromJson(needs.job1.outputs.matrix)}}"
-          echo Last: "${{fromJson(needs.job1.outputs.matrix)[-1]}}"
 
   job3:
     needs: [ job1 ]
