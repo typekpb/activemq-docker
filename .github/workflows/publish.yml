@@ -8,6 +8,13 @@ on:
   pull_request:
     branches:
       - main
+  workflow_dispatch:
+    inputs:
+      force:
+        type: boolean
+        description: "Whether all the tags are to be re-pushed to docker hub, regardless whether they already exist or not."
+        required: false
+        default: false
 
 env:
   URL_RELEASES: "https://archive.apache.org/dist/activemq"
@@ -33,19 +40,25 @@ jobs:
           pip install -r requirements.txt
       - id: matrix
         run: |
+          if [[ "${{ github.event.inputs.force }}" == "true" ]]
+          then
+            ARG_FORCE="--force"
+          else
+            ARG_FORCE=""
+          fi
           echo dry run
-          python print_versions.py -r $URL_RELEASES -t $URL_TAGS
-          python print_versions.py -r $URL_RELEASES -t $URL_TAGS --latest-only
+          python print_versions.py -r $URL_RELEASES -t $URL_TAGS $ARG_FORCE
+          python print_versions.py -r $URL_RELEASES -t $URL_TAGS --latest-only $ARG_FORCE
           echo assigning job outputs
-          echo "::set-output name=matrix::$(python print_versions.py -r $URL_RELEASES -t $URL_TAGS)"
-          echo "::set-output name=latest::$(python print_versions.py -r $URL_RELEASES -t $URL_TAGS --latest-only)"
+          echo "::set-output name=matrix::$(python print_versions.py -r $URL_RELEASES -t $URL_TAGS $ARG_FORCE)"
+          echo "::set-output name=latest::$(python print_versions.py -r $URL_RELEASES -t $URL_TAGS --latest-only $ARG_FORCE)"
 
   publish:
      needs: [ identify ]
      runs-on: ubuntu-latest
      strategy:
        matrix:
-         value: ${{fromJson(needs.identify.outputs.matrix)}}
+         version: ${{fromJson(needs.identify.outputs.matrix)}}
      if: github.ref == 'refs/heads/main'
      steps:
        - name: Checkout
@@ -59,40 +72,95 @@ jobs:
          with:
            username: ${{ secrets.DOCKERHUB_USERNAME }}
            password: ${{ secrets.DOCKERHUB_TOKEN }}
-       - name: Base image identification
-         id: base-image
-         run: |
-           # AMQ versions >=5.9.x && <= 5.13.x => JDK 7
-           if [[ ${{ matrix.value }} =~ ^5\.(9|10|11|12|13)\.[0-9]+$ ]]; then
-               echo ::set-output name=build_openjdk::true
-               echo ::set-output name=from_openjdk::openjdk:7
-               echo ::set-output name=build_alpine::false
-           else
-              # JDK 8 + alpine
-               echo ::set-output name=build_openjdk::true
-               echo ::set-output name=from_openjdk::openjdk:8-jre
-               echo ::set-output name=build_alpine::true
-               echo ::set-output name=from_alpine::openjdk:8-jre-alpine
-           fi
-       - name: Build and push from openjdk
+
+       - name: Build and push from openjdk 7
          uses: docker/build-push-action@v2.7.0
-         if: ${{ steps.base-image.outputs.build_openjdk }}
+         if: |
+           startsWith(matrix.value, '5.9') == true ||
+           startsWith(matrix.value, '5.10') == true || 
+           startsWith(matrix.value, '5.11') == true || 
+           startsWith(matrix.value, '5.12') == true || 
+           startsWith(matrix.value, '5.13') == true
          with:
            push: true
            build-args: |
-              ACTIVEMQ_VERSION=${{ matrix.value }}
-              BASE_IMG=${{ steps.base-image.outputs.from_openjdk }}
-           tags: butkovic/activemq:${{ matrix.value }}
-       - name: Build and push from openjdk alpine
+              ACTIVEMQ_VERSION=${{ matrix.version }}
+              BASE_IMG=openjdk:7
+           tags: butkovic/activemq:${{ matrix.version }}
+           platforms: |
+             linux/amd64
+
+       - name: Build and push from amazoncorretto 8
          uses: docker/build-push-action@v2.7.0
-         if: ${{ steps.base-image.outputs.build_alpine }}
+         if: |
+           startsWith(matrix.value, '5.14') == true ||
+           startsWith(matrix.value, '5.15') == true
          with:
            push: true
            build-args: |
-              ACTIVEMQ_VERSION=${{ matrix.value }}
-              BASE_IMG=${{ steps.base-image.outputs.from_alpine }}
-           file: Dockerfile.alpine
-           tags: butkovic/activemq:${{ matrix.value }}-alpine
+             ACTIVEMQ_VERSION=${{ matrix.version }}
+             BASE_IMG=amazoncorretto:8
+           file: Dockerfile.amazoncorretto
+           tags: butkovic/activemq:${{ matrix.version }}
+           platforms: |
+             linux/amd64
+             linux/arm64/v8
+
+       - name: Build and push from amazoncorretto 8 alpine
+         uses: docker/build-push-action@v2.7.0
+         if: |
+           startsWith(matrix.value, '5.14') == true ||
+           startsWith(matrix.value, '5.15') == true
+         with:
+           push: true
+           build-args: |
+             ACTIVEMQ_VERSION=${{ matrix.version }}
+             BASE_IMG=8-alpine-jre
+           file: Dockerfile.amazoncorretto-alpine
+           tags: butkovic/activemq:${{ matrix.version }}-alpine
+           platforms: |
+             linux/amd64
+
+       - name: Build and push from amazoncorretto 11
+         uses: docker/build-push-action@v2.7.0
+         if: |
+           startsWith(matrix.value, '5.9') == false ||
+           startsWith(matrix.value, '5.10') == false || 
+           startsWith(matrix.value, '5.11') == false || 
+           startsWith(matrix.value, '5.12') == false || 
+           startsWith(matrix.value, '5.13') == false ||
+           startsWith(matrix.value, '5.14') == false ||
+           startsWith(matrix.value, '5.15') == false
+         with:
+           push: true
+           build-args: |
+              ACTIVEMQ_VERSION=${{ matrix.version }}
+              BASE_IMG=amazoncorretto:11
+           file: Dockerfile.amazoncorretto
+           tags: butkovic/activemq:${{ matrix.version }}
+           platforms: |
+             linux/amd64
+             linux/arm64/v8
+
+       - name: Build and push from amazoncorretto 11 alpine
+         uses: docker/build-push-action@v2.7.0
+         if: |
+           startsWith(matrix.value, '5.9') == false ||
+           startsWith(matrix.value, '5.10') == false || 
+           startsWith(matrix.value, '5.11') == false || 
+           startsWith(matrix.value, '5.12') == false || 
+           startsWith(matrix.value, '5.13') == false ||
+           startsWith(matrix.value, '5.14') == false ||
+           startsWith(matrix.value, '5.15') == false
+         with:
+           push: true
+           build-args: |
+              ACTIVEMQ_VERSION=${{ matrix.version }}
+              BASE_IMG=amazoncorretto:11-alpine
+           file: Dockerfile.amazoncorretto.alpine
+           tags: butkovic/activemq:${{ matrix.version }}-alpine
+           platforms: |
+             linux/amd64
 
   publish-latest:
      needs: [ identify ]
@@ -113,11 +181,16 @@ jobs:
          with:
            username: ${{ secrets.DOCKERHUB_USERNAME }}
            password: ${{ secrets.DOCKERHUB_TOKEN }}
-       - name: Build and push latest
+
+       - name: Build and push latest from amazoncorretto 11
          uses: docker/build-push-action@v2.7.0
          with:
            push: true
            build-args: |
-             ACTIVEMQ_VERSION=${{ matrix.value }}
-             BASE_IMG=openjdk:8-jre
+             ACTIVEMQ_VERSION=${{ matrix.version }}
+             BASE_IMG=amazoncorretto:11
+           file: Dockerfile.amazoncorretto
            tags: butkovic/activemq:latest
+           platforms: |
+             linux/amd64
+             linux/arm64/v8

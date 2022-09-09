@@ -1,0 +1,30 @@
+ARG BASE_IMG
+
+FROM $BASE_IMG
+
+ARG ACTIVEMQ_VERSION
+
+ENV ACTIVEMQ_TCP=61616 \
+    ACTIVEMQ_AMQP=5672 \
+    ACTIVEMQ_STOMP=61613 \
+    ACTIVEMQ_MQTT=1883 \
+    ACTIVEMQ_WS=61614 \
+    ACTIVEMQ_UI=8161 \
+    ACTIVEMQ_HOME=/opt/activemq
+
+RUN curl "https://archive.apache.org/dist/activemq/$ACTIVEMQ_VERSION/apache-activemq-$ACTIVEMQ_VERSION-bin.tar.gz" -o apache-activemq-$ACTIVEMQ_VERSION-bin.tar.gz
+
+RUN yum install -yy tar gzip shadow-utils && \
+    tar xzf apache-activemq-$ACTIVEMQ_VERSION-bin.tar.gz -C  /opt && \
+    ln -s /opt/apache-activemq-$ACTIVEMQ_VERSION $ACTIVEMQ_HOME && \
+    /usr/sbin/adduser -r -M -d $ACTIVEMQ_HOME activemq && \
+    chown -R activemq:activemq /opt/apache-activemq-$ACTIVEMQ_VERSION && \
+    chown -h activemq:activemq $ACTIVEMQ_HOME && \
+    yum remove -yy tar gzip shadow-utils
+
+USER activemq
+
+WORKDIR $ACTIVEMQ_HOME
+EXPOSE $ACTIVEMQ_TCP $ACTIVEMQ_AMQP $ACTIVEMQ_STOMP $ACTIVEMQ_MQTT $ACTIVEMQ_WS $ACTIVEMQ_UI
+
+CMD ["/bin/sh", "-c", "bin/activemq console"]

@@ -30,28 +30,35 @@ def get_pushed_tags(url):
 
 def main(argv):
     latestOnly = False
+    force = False
 
     try:
-        opts, args = getopt.getopt(argv, "hlt:r:", ["tags-url=", "releases-url=", "latest-only"])
+        opts, args = getopt.getopt(argv, "hlft:r:", ["tags-url=", "releases-url=", "latest-only", "force"])
     except getopt.GetoptError:
         print
-        'print_versions.py -t <dockerhub tags url> -r <releases url> [--latest-only]'
+        'print_versions.py -t <dockerhub tags url> -r <releases url> [--latest-only] [--force]'
         sys.exit(2)
     for opt, arg in opts:
         if opt == '-h':
             print
-            'print_versions.py -t <dockerhub tags url> -r <release url> [--latest-only]'
+            'print_versions.py -t <dockerhub tags url> -r <release url> [--latest-only] [--force]'
             sys.exit()
         elif opt in ("-t", "--tags-url"):
             urlTags = arg
+        elif opt in ("-f", "--force"):
+            force = True
         elif opt in ("-r", "--releases-url"):
             urlReleases = arg
         elif opt in ("-l", "--latest-only"):
             latestOnly = True
 
-    releases = get_releases(urlReleases)
-    tags = get_pushed_tags(urlTags)
+    if force:
+        # ignore pushed tags
+        tags = []
+    else:
+        tags = get_pushed_tags(urlTags)
 
+    releases = get_releases(urlReleases)
     result = [x for x in releases if x not in tags]
     result.sort(key=Version)
 
