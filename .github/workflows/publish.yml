@@ -86,6 +86,7 @@ jobs:
            build-args: |
               ACTIVEMQ_VERSION=${{ matrix.version }}
               BASE_IMG=openjdk:7
+           file: Dockerfile.openjdk
            tags: butkovic/activemq:${{ matrix.version }}
            platforms: |
              linux/amd64
