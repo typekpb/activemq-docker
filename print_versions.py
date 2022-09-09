@@ -23,7 +23,6 @@ def get_pushed_tags(url):
     if (response.status_code != 404):
         tags = []
         json = response.json()
-        print(json)
         tags = [container['name'] for container in json['results']]
 
     return tags
