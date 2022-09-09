@@ -62,11 +62,11 @@ def main(argv):
     result.sort(key=Version)
 
     if not result:
-        print(json.dumps([]))
+        print(json.dumps([]), end="")
     elif latestOnly:
-        print("[" + json.dumps(result[-1]) + "]")
+        print("[" + json.dumps(result[-1]) + "]", end="")
     else:
-        print(json.dumps(result))
+        print(json.dumps(result), end="")
     sys.exit()
 
 if __name__ == "__main__":
