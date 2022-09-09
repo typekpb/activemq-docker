@@ -117,7 +117,7 @@ jobs:
            build-args: |
              ACTIVEMQ_VERSION=${{ matrix.version }}
              BASE_IMG=amazoncorretto:8-alpine-jre
-           file: Dockerfile.amazoncorretto-alpine
+           file: Dockerfile.amazoncorretto.alpine
            tags: butkovic/activemq:${{ matrix.version }}-alpine
            platforms: |
              linux/amd64
