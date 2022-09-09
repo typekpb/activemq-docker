@@ -61,7 +61,7 @@ jobs:
          version: ${{fromJson(needs.identify.outputs.matrix)}}
      if: |
        github.ref == 'refs/heads/main' &&
-       ${{ fromJson(needs.identify.outputs.matrix) != '[]' && fromJson(needs.identify.outputs.matrix) != '' }}
+       ${{ needs.identify.outputs.matrix != '[]' && needs.identify.outputs.matrix != '' }}
      steps:
        - name: Checkout
          uses: actions/checkout@v2.3.5
@@ -173,7 +173,7 @@ jobs:
           version: ${{fromJson(needs.identify.outputs.latest)}}
      if: |
        github.ref == 'refs/heads/main' &&
-       ${{ fromJson(needs.identify.outputs.latest) != '[]' && fromJson(needs.identify.outputs.latest) != '' }}
+       ${{ needs.identify.outputs.latest != '[]' && needs.identify.outputs.latest != '' }}
      steps:
        - name: Checkout
          uses: actions/checkout@v2.3.5
