@@ -125,12 +125,12 @@ jobs:
        - name: Build and push from amazoncorretto 11
          uses: docker/build-push-action@v3.1.1
          if: |
-           startsWith(matrix.version, '5.9') == false ||
-           startsWith(matrix.version, '5.10') == false || 
-           startsWith(matrix.version, '5.11') == false || 
-           startsWith(matrix.version, '5.12') == false || 
-           startsWith(matrix.version, '5.13') == false ||
-           startsWith(matrix.version, '5.14') == false ||
+           startsWith(matrix.version, '5.9') == false &&
+           startsWith(matrix.version, '5.10') == false &&
+           startsWith(matrix.version, '5.11') == false && 
+           startsWith(matrix.version, '5.12') == false && 
+           startsWith(matrix.version, '5.13') == false &&
+           startsWith(matrix.version, '5.14') == false &&
            startsWith(matrix.version, '5.15') == false
          with:
            push: true
@@ -146,12 +146,12 @@ jobs:
        - name: Build and push from amazoncorretto 11 alpine
          uses: docker/build-push-action@v3.1.1
          if: |
-           startsWith(matrix.version, '5.9') == false ||
-           startsWith(matrix.version, '5.10') == false || 
-           startsWith(matrix.version, '5.11') == false || 
-           startsWith(matrix.version, '5.12') == false || 
-           startsWith(matrix.version, '5.13') == false ||
-           startsWith(matrix.version, '5.14') == false ||
+           startsWith(matrix.version, '5.9') == false &&
+           startsWith(matrix.version, '5.10') == false && 
+           startsWith(matrix.version, '5.11') == false && 
+           startsWith(matrix.version, '5.12') == false && 
+           startsWith(matrix.version, '5.13') == false &&
+           startsWith(matrix.version, '5.14') == false &&
            startsWith(matrix.version, '5.15') == false
          with:
            push: true
