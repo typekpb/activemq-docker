@@ -15,5 +15,5 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-          repository: typekpb/activemq-docker
+          repository: butkovic/activemq-docker
           short-description: "Docker images of ActiveMQ"
