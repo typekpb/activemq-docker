@@ -4,10 +4,14 @@ on:
     branches:
       - main
 jobs:
-    - name: Docker Hub Description
-      uses: peter-evans/dockerhub-description@v3.1.0
-      with:
-        username: ${{ secrets.DOCKERHUB_USERNAME }}
-        password: ${{ secrets.DOCKERHUB_PASSWORD }}
-        repository: typekpb/activemq-docker
-        short-description: "Docker images of ActiveMQ"
+
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Docker Hub Description
+        uses: peter-evans/dockerhub-description@v3.1.0
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+          repository: typekpb/activemq-docker
+          short-description: "Docker images of ActiveMQ"
