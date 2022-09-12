@@ -59,9 +59,7 @@ jobs:
      strategy:
        matrix:
          version: ${{fromJson(needs.identify.outputs.matrix)}}
-     if: |
-       github.ref == 'refs/heads/main' &&
-       ${{ needs.identify.outputs.matrix != '[]' && needs.identify.outputs.matrix != '' }}
+     if: ${{ github.ref == 'refs/heads/main' && needs.identify.outputs.matrix != '[]' && needs.identify.outputs.matrix != '' }}
      steps:
        - name: Checkout
          uses: actions/checkout@v2.3.5
@@ -78,14 +76,11 @@ jobs:
        - name: Build and push from openjdk 7
          uses: docker/build-push-action@v3.1.1
          if: |
-           ${{ matrix.version != '' }} &&
-           ( 
-             startsWith(matrix.version, '5.9') == true ||
-             startsWith(matrix.version, '5.10') == true || 
-             startsWith(matrix.version, '5.11') == true || 
-             startsWith(matrix.version, '5.12') == true || 
-             startsWith(matrix.version, '5.13') == true
-           )
+           startsWith(matrix.version, '5.9') == true ||
+           startsWith(matrix.version, '5.10') == true || 
+           startsWith(matrix.version, '5.11') == true || 
+           startsWith(matrix.version, '5.12') == true || 
+           startsWith(matrix.version, '5.13') == true
          with:
            push: true
            build-args: |
@@ -99,11 +94,8 @@ jobs:
        - name: Build and push from amazoncorretto 8
          uses: docker/build-push-action@v3.1.1
          if: |
-           ${{ matrix.version != '' }} &&
-           (
-             startsWith(matrix.version, '5.14') == true ||
-             startsWith(matrix.version, '5.15') == true
-           )
+           startsWith(matrix.version, '5.14') == true ||
+           startsWith(matrix.version, '5.15') == true
          with:
            push: true
            build-args: |
@@ -118,11 +110,8 @@ jobs:
        - name: Build and push from amazoncorretto 8 alpine
          uses: docker/build-push-action@v3.1.1
          if: |
-           ${{ matrix.version != '' }} &&
-           (
            startsWith(matrix.version, '5.14') == true ||
            startsWith(matrix.version, '5.15') == true
-           )
          with:
            push: true
            build-args: |
@@ -136,16 +125,13 @@ jobs:
        - name: Build and push from amazoncorretto 11
          uses: docker/build-push-action@v3.1.1
          if: |
-           ${{ matrix.version != '' }} &&
-           (
-             startsWith(matrix.version, '5.9') == false ||
-             startsWith(matrix.version, '5.10') == false || 
-             startsWith(matrix.version, '5.11') == false || 
-             startsWith(matrix.version, '5.12') == false || 
-             startsWith(matrix.version, '5.13') == false ||
-             startsWith(matrix.version, '5.14') == false ||
-             startsWith(matrix.version, '5.15') == false
-           )
+           startsWith(matrix.version, '5.9') == false ||
+           startsWith(matrix.version, '5.10') == false || 
+           startsWith(matrix.version, '5.11') == false || 
+           startsWith(matrix.version, '5.12') == false || 
+           startsWith(matrix.version, '5.13') == false ||
+           startsWith(matrix.version, '5.14') == false ||
+           startsWith(matrix.version, '5.15') == false
          with:
            push: true
            build-args: |
@@ -160,16 +146,13 @@ jobs:
        - name: Build and push from amazoncorretto 11 alpine
          uses: docker/build-push-action@v3.1.1
          if: |
-           ${{ matrix.version != '' }} &&
-           (
-             startsWith(matrix.version, '5.9') == false ||
-             startsWith(matrix.version, '5.10') == false || 
-             startsWith(matrix.version, '5.11') == false || 
-             startsWith(matrix.version, '5.12') == false || 
-             startsWith(matrix.version, '5.13') == false ||
-             startsWith(matrix.version, '5.14') == false ||
-             startsWith(matrix.version, '5.15') == false
-           )
+           startsWith(matrix.version, '5.9') == false ||
+           startsWith(matrix.version, '5.10') == false || 
+           startsWith(matrix.version, '5.11') == false || 
+           startsWith(matrix.version, '5.12') == false || 
+           startsWith(matrix.version, '5.13') == false ||
+           startsWith(matrix.version, '5.14') == false ||
+           startsWith(matrix.version, '5.15') == false
          with:
            push: true
            build-args: |
@@ -186,9 +169,7 @@ jobs:
      strategy:
        matrix:
           version: ${{fromJson(needs.identify.outputs.latest)}}
-     if: |
-       github.ref == 'refs/heads/main' &&
-       ${{ needs.identify.outputs.latest != '[]' && needs.identify.outputs.latest != '' }}
+     if: ${{ github.ref == 'refs/heads/main' && needs.identify.outputs.latest != '[]' && needs.identify.outputs.latest != '' }}
      steps:
        - name: Checkout
          uses: actions/checkout@v2.3.5
