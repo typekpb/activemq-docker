@@ -1,21 +1,28 @@
 # activemq-docker
 
-Please note, the repo itself got heavily inspired by the 
+[![Docker Pulls](https://img.shields.io/docker/pulls/butkovic/activemq.svg?maxAge=2592000)](https://hub.docker.com/r/butkovic/activemq/)
 
+## Credits
+
+Please note, the repo itself got heavily inspired by the https://github.com/rmohr/docker-activemq.
+Just a bit more automation of new image releases provided.
+
+## Running
 Run the latest container with:
-
+```commandline
 docker pull butkovic/activemq
 docker run -p 61616:61616 -p 8161:8161 butkovic/activemq
 The JMX broker listens on port 61616 and the Web Console on port 8161.
-
+```
 
 ## Port Map
-61616 JMS
-8161  UI
-5672  AMQP  
-61613 STOMP 
-1883  MQTT  
-61614 WS    
+
+* 61616 JMS
+* 8161  UI
+* 5672  AMQP  
+* 61613 STOMP 
+* 1883  MQTT  
+* 61614 WS    
 
 ## Customizing configuration and persistence location
 By default data and configuration is stored inside the container and will be lost after the container has been shut down and removed. To persist these files you can mount these directories to directories on your host system:
