@@ -20,6 +20,7 @@ RUN yum install -yy tar gzip shadow-utils && \
     /usr/sbin/adduser -r -M -d $ACTIVEMQ_HOME activemq && \
     chown -R activemq:activemq /opt/apache-activemq-$ACTIVEMQ_VERSION && \
     chown -h activemq:activemq $ACTIVEMQ_HOME && \
+    sed -i 's/127.0.0.1/0.0.0.0/g' /opt/apache-activemq-$ACTIVEMQ_VERSION/conf/jetty.xml && \
     yum remove -yy tar gzip shadow-utils
 
 USER activemq

@@ -18,6 +18,7 @@ RUN tar xzf activemq-bin.tar.gz -C  /opt && \
     addgroup -S activemq && adduser -S -H -G activemq -h $ACTIVEMQ_HOME activemq && \
     chown -R activemq:activemq /opt/$ACTIVEMQ && \
     chown -h activemq:activemq $ACTIVEMQ_HOME && \
+    sed -i 's/127.0.0.1/0.0.0.0/g' /opt/apache-activemq-$ACTIVEMQ_VERSION/conf/jetty.xml && \
     apk del build-dependencies && \
     rm -rf /var/cache/apk/*
 
